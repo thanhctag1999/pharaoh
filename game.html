@@ -24,7 +24,7 @@
         height: 100%;
         overflow: hidden;
         background: #17100c;
-        font-family: Arial, Helvetica, sans-serif;
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
         color: #fff;
       }
       #app {
@@ -37,10 +37,10 @@
       }
       #gameWrap {
         position: relative;
-        height: 100%;
-        max-height: 932px;
+        height: min(100vh, calc(100vw * 844 / 390), 932px);
         aspect-ratio: 390/844;
-        width: min(100vw, 430px);
+        width: auto;
+        max-width: 100vw;
         overflow: hidden;
         background: #d9963c;
         box-shadow: 0 0 35px #000;
@@ -57,50 +57,82 @@
         left: 0;
         right: 0;
         top: 0;
-        padding: 10px;
+        padding: 10px 9px;
         display: flex;
-        gap: 7px;
+        gap: 6px;
         align-items: center;
         pointer-events: none;
       }
       .pill {
-        background: rgba(25, 24, 23, 0.9);
-        border: 2px solid rgba(255, 255, 255, 0.12);
-        border-radius: 18px;
-        padding: 7px 11px;
+        min-height: 39px;
+        background: linear-gradient(180deg, rgba(54, 60, 67, 0.98), rgba(16, 18, 21, 0.96));
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-bottom-color: #090909;
+        border-radius: 22px;
+        padding: 6px 11px;
         font-weight: 900;
-        text-shadow: 0 2px 2px #000;
+        font-size: 17px;
+        text-shadow: 0 2px 2px #000, 0 0 2px #000;
         display: flex;
         gap: 5px;
         align-items: center;
+        box-shadow: inset 0 1px 0 #ffffff33, 0 3px 8px #0007;
       }
       #roundPill {
         position: absolute;
-        top: 55px;
+        top: 60px;
         left: 50%;
         transform: translateX(-50%);
-        padding: 7px 18px;
-        border-color: #d9a62e;
+        min-width: 220px;
+        justify-content: center;
+        padding: 8px 18px;
+        border: 3px solid #e3aa42;
+        border-radius: 9px;
+        font-size: 20px;
+        background: linear-gradient(#303239, #111217);
+        box-shadow: inset 0 0 0 2px #5b3513, 0 4px 9px #0008;
+        z-index: 3;
+      }
+      #roundPill::before,
+      #roundPill::after {
+        content: "◆";
+        position: absolute;
+        top: 50%;
+        color: #f2b63f;
+        font-size: 24px;
+        text-shadow: 0 2px #6f3b0a;
+      }
+      #roundPill::before {
+        left: -22px;
+        transform: translateY(-50%) rotate(18deg);
+      }
+      #roundPill::after {
+        right: -22px;
+        transform: translateY(-50%) rotate(-18deg);
       }
       #pauseBtn {
         margin-left: auto;
-        width: 48px;
-        height: 48px;
+        width: 47px;
+        height: 47px;
         pointer-events: auto;
         border: 3px solid #e6b95f;
-        border-radius: 14px;
-        background: #252525;
+        border-radius: 13px;
+        background: linear-gradient(#30343b, #111318);
         padding: 10px;
+        box-shadow: inset 0 0 0 2px #5e3615, 0 3px 7px #0008;
       }
       #objective {
         position: absolute;
-        top: 96px;
+        top: 110px;
         left: 50%;
         transform: translateX(-50%);
-        background: rgba(24, 16, 10, 0.68);
-        padding: 6px 12px;
+        background: rgba(27, 23, 18, 0.76);
+        border: 1px solid #d9a84f66;
+        padding: 6px 13px;
         border-radius: 14px;
-        font-size: 13px;
+        font-size: 12px;
+        font-weight: 800;
+        text-shadow: 0 2px #000;
         white-space: nowrap;
       }
       .controls {
@@ -115,8 +147,9 @@
         width: 132px;
         height: 132px;
         border-radius: 50%;
-        background: rgba(20, 20, 20, 0.32);
-        border: 2px solid rgba(255, 255, 255, 0.18);
+        background: radial-gradient(circle, #80674633 0 40%, #211a14aa 72%);
+        border: 3px solid rgba(245, 225, 191, 0.42);
+        box-shadow: inset 0 0 25px #0008, 0 5px 12px #0006;
         pointer-events: auto;
         touch-action: none;
       }
@@ -127,16 +160,16 @@
         border-radius: 50%;
         left: 33px;
         top: 33px;
-        background: radial-gradient(circle at 35% 30%, #fff, #bbb 70%);
-        border: 4px solid #fff;
-        box-shadow: 0 4px 8px #0008;
+        background: radial-gradient(circle at 35% 30%, #f8eee5, #b7a79c 65%, #706158);
+        border: 4px solid #f5e8db;
+        box-shadow: inset 0 -5px 8px #6d5c50aa, 0 5px 10px #0009;
       }
       .action {
         position: absolute;
         border-radius: 50%;
-        border: 3px solid #f6d178;
-        background: rgba(25, 20, 16, 0.9);
-        box-shadow: 0 5px 12px #0008;
+        border: 3px solid #f3c971;
+        background: radial-gradient(circle at 38% 30%, #403424, #161310 67%);
+        box-shadow: inset 0 0 0 3px #6e4117, inset 0 0 16px #000, 0 6px 13px #0009;
         pointer-events: auto;
         display: grid;
         place-items: center;
@@ -148,27 +181,27 @@
       }
       #throwBtn {
         right: 18px;
-        bottom: 142px;
-        width: 82px;
-        height: 82px;
+        bottom: 150px;
+        width: 88px;
+        height: 88px;
       }
       #meleeBtn {
-        right: 88px;
-        bottom: 60px;
-        width: 74px;
-        height: 74px;
+        right: 92px;
+        bottom: 64px;
+        width: 78px;
+        height: 78px;
       }
       #dashBtn {
         right: 18px;
         bottom: 18px;
-        width: 68px;
-        height: 68px;
+        width: 72px;
+        height: 72px;
       }
       #itemBtn {
-        right: 7px;
-        bottom: 238px;
-        width: 56px;
-        height: 56px;
+        right: 8px;
+        bottom: 253px;
+        width: 58px;
+        height: 58px;
       }
       #itemCount {
         position: absolute;
@@ -299,7 +332,7 @@
       #toast {
         position: absolute;
         left: 50%;
-        top: 132px;
+        top: 148px;
         transform: translateX(-50%);
         background: #17120ee8;
         border: 2px solid #e3bb57;
@@ -331,9 +364,9 @@
         <canvas id="game" width="390" height="844"></canvas>
 
         <div class="hud">
-          <div class="pill">❤️ <span id="lives">1</span></div>
+          <div class="pill">❤️ <span id="lives">5/5</span></div>
           <div class="pill">🪙 <span id="coins">0</span></div>
-          <div class="pill">🏆 <span id="score">0</span></div>
+          <div class="pill">💎 <span id="score">0</span></div>
           <button id="pauseBtn">
             <img src="assets/pause.svg" alt="Pause" />
           </button>
@@ -356,7 +389,7 @@
             <img src="assets/dash.svg" alt="Lướt" />
           </button>
           <button class="action" id="itemBtn">
-            <img id="itemIcon" src="assets/shield.svg" alt="Item" /><span
+            <span id="itemIcon" aria-hidden="true" style="font-size: 29px">🏺</span><span
               id="itemCount"
               >0</span
             >
@@ -624,7 +657,10 @@
         $("score").textContent = playerScore;
         $("scoreTarget").textContent = scoreTarget;
         $("coins").textContent = coins;
-        $("lives").textContent = player && player.alive ? 1 : 0;
+        const units = player ? [player, ...enemies] : [];
+        $("lives").textContent = units.length
+          ? `${units.filter((u) => u.alive).length}/${units.length}`
+          : "0/0";
         $("itemCount").textContent = player ? activeItemCount(player) : 0;
       }
       function activeItemCount(u) {
@@ -1136,101 +1172,246 @@
         particles = particles.filter((p) => p.t < 0.7);
         updateHUD();
       }
-      function drawMap() {
-        const g = ctx.createLinearGradient(0, 140, 0, H);
-        g.addColorStop(0, "#e6ad55");
-        g.addColorStop(1, "#b76a28");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-        // tiles
-        ctx.strokeStyle = "rgba(107,61,25,.18)";
+      function polygon(points, fill, stroke = null, width = 1) {
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = width;
+          ctx.stroke();
+        }
+      }
+      function drawPyramid(x, y, size, blue = true) {
+        ctx.fillStyle = "rgba(67,39,18,.3)";
+        ctx.beginPath();
+        ctx.ellipse(x + 8, y + 10, size * 0.7, size * 0.26, 0.1, 0, Math.PI * 2);
+        ctx.fill();
+        polygon([[x, y - size], [x - size, y + size * 0.3], [x, y + size * 0.5]], "#f0bd61", "#7c431b", 1.2);
+        polygon([[x, y - size], [x, y + size * 0.5], [x + size, y + size * 0.3]], "#c8792e", "#7c431b", 1.2);
+        if (blue) {
+          polygon(
+            [[x - size * 0.74, y - size * 0.02], [x, y + size * 0.27], [x + size * 0.73, y - size * 0.02], [x + size * 0.82, y + size * 0.16], [x, y + size * 0.48], [x - size * 0.82, y + size * 0.16]],
+            "#087f9c",
+            "#f1b74c",
+            1.4,
+          );
+        }
+        ctx.strokeStyle = "rgba(113,61,23,.45)";
+        for (let i = 1; i < 4; i++) {
+          const yy = y - size + (size * 1.35 * i) / 4;
+          ctx.beginPath();
+          ctx.moveTo(x - size * i / 4, yy);
+          ctx.lineTo(x + size * i / 4, yy);
+          ctx.stroke();
+        }
+      }
+      function drawPalm(x, y, scale = 1) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = "rgba(49,30,14,.28)";
+        ctx.beginPath();
+        ctx.ellipse(7, 7, 20, 7, 0.25, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#74411d";
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(0, 5);
+        ctx.quadraticCurveTo(-4, -20, 2, -42);
+        ctx.stroke();
+        ctx.strokeStyle = "#a9682c";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        for (let i = 0; i < 8; i++) {
+          const a = (Math.PI * 2 * i) / 8 - 0.25;
+          ctx.save();
+          ctx.translate(2, -42);
+          ctx.rotate(a);
+          polygon([[0, 0], [10, -5], [28, 0], [10, 5]], i % 2 ? "#3c7b2b" : "#5e982e", "#315c22");
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+      function drawSandstoneWall(w) {
+        const z = Math.min(13, Math.max(8, w.h * 0.45));
+        ctx.fillStyle = "rgba(59,35,17,.33)";
+        ctx.fillRect(w.x + 6, w.y + 7, w.w, w.h);
+        polygon([[w.x, w.y - z], [w.x + w.w, w.y - z], [w.x + w.w, w.y + w.h - z], [w.x, w.y + w.h - z]], "#e4a64d", "#7b431e", 1.3);
+        polygon([[w.x, w.y + w.h - z], [w.x + w.w, w.y + w.h - z], [w.x + w.w, w.y + w.h], [w.x, w.y + w.h]], "#9f5d29", "#6b391a", 1.2);
+        ctx.strokeStyle = "rgba(113,61,25,.5)";
         ctx.lineWidth = 1;
-        for (let y = 145; y < H; y += 28)
-          for (let x = ((y / 28) % 2) * 14 - 14; x < W; x += 28)
-            ctx.strokeRect(x, y, 28, 28);
-        // distant structures
-        ctx.fillStyle = "#e2a04a";
+        for (let x = w.x + 17; x < w.x + w.w; x += 18) {
+          ctx.beginPath();
+          ctx.moveTo(x, w.y - z);
+          ctx.lineTo(x - 3, w.y + w.h - z);
+          ctx.stroke();
+        }
+        ctx.fillStyle = "#087f9c";
+        ctx.fillRect(w.x + 2, w.y + w.h - z + 2, Math.max(0, w.w - 4), 3);
+        ctx.fillStyle = "#efb54d";
+        for (let x = w.x + 9; x < w.x + w.w - 4; x += 20) {
+          ctx.beginPath();
+          ctx.arc(x, w.y + w.h - z + 3.5, 1.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      function drawObelisk(w) {
+        const x = w.x + w.w / 2;
+        const y = w.y + w.h - 5;
+        const height = 76;
+        ctx.fillStyle = "rgba(64,39,18,.3)";
         ctx.beginPath();
-        ctx.moveTo(45, 145);
-        ctx.lineTo(90, 70);
-        ctx.lineTo(135, 145);
+        ctx.ellipse(x + 10, y + 5, 29, 10, 0.2, 0, Math.PI * 2);
         ctx.fill();
+        polygon([[x - 24, y - 12], [x + 24, y - 12], [x + 29, y + 5], [x - 29, y + 5]], "#b86d2c", "#6f3a18", 1.5);
+        polygon([[x - 17, y - height + 15], [x + 12, y - height + 15], [x + 17, y - 12], [x - 18, y - 12]], "#dea14b", "#744019", 1.4);
+        polygon([[x + 12, y - height + 15], [x + 19, y - height + 22], [x + 17, y - 12], [x + 12, y - 12]], "#9e5926");
+        polygon([[x - 17, y - height + 15], [x, y - height - 8], [x + 12, y - height + 15]], "#f1c36d", "#744019", 1.3);
+        ctx.fillStyle = "#1887a1";
+        ctx.fillRect(x - 18, y - 28, 35, 5);
+        ctx.fillStyle = "#7e421d";
+        ctx.font = "14px serif";
+        ctx.textAlign = "center";
+        ctx.fillText("𓂀", x - 1, y - 42);
+      }
+      function drawTempleGate(x, y, width) {
+        ctx.fillStyle = "rgba(54,31,13,.3)";
+        ctx.fillRect(x + 8, y + 8, width, 30);
+        drawSandstoneWall({ x, y: y + 4, w: 32, h: 28 });
+        drawSandstoneWall({ x: x + width - 32, y: y + 4, w: 32, h: 28 });
+        polygon([[x + 22, y - 18], [x + width - 22, y - 18], [x + width - 16, y + 7], [x + 16, y + 7]], "#bd752f", "#713c19", 1.5);
+        ctx.fillStyle = "#087e9d";
+        ctx.fillRect(x + 24, y - 13, width - 48, 7);
+        ctx.fillStyle = "#f0b441";
         ctx.beginPath();
-        ctx.moveTo(265, 145);
-        ctx.lineTo(315, 50);
-        ctx.lineTo(365, 145);
+        ctx.arc(x + width / 2, y - 3, 8, 0, Math.PI * 2);
         ctx.fill();
-        // walls
-        walls.forEach((w) => {
-          ctx.fillStyle = "#8c5427";
-          ctx.fillRect(w.x + 4, w.y + 6, w.w, w.h);
-          ctx.fillStyle = "#d89a49";
-          ctx.fillRect(w.x, w.y, w.w, w.h);
-          ctx.strokeStyle = "#6e3d1d";
-          ctx.strokeRect(w.x, w.y, w.w, w.h);
-          for (let x = w.x + 8; x < w.x + w.w; x += 18) {
+      }
+      function drawMap() {
+        const sky = ctx.createLinearGradient(0, 0, 0, 190);
+        sky.addColorStop(0, "#55aee5");
+        sky.addColorStop(0.55, "#b8d8dc");
+        sky.addColorStop(1, "#e0a75b");
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, W, H);
+
+        polygon([[0, 120], [42, 74], [79, 116], [126, 61], [175, 120], [226, 72], [278, 122], [335, 60], [390, 116], [390, 180], [0, 180]], "#b9824c");
+        polygon([[0, 139], [52, 103], [91, 140], [151, 91], [205, 142], [270, 96], [326, 140], [390, 99], [390, 190], [0, 190]], "#d29a55");
+        drawPyramid(73, 143, 40, false);
+        drawPyramid(315, 139, 60, false);
+
+        const ground = ctx.createLinearGradient(0, 145, 0, H);
+        ground.addColorStop(0, "#e6ad57");
+        ground.addColorStop(0.65, "#d18a38");
+        ground.addColorStop(1, "#b96c2c");
+        ctx.fillStyle = ground;
+        ctx.fillRect(0, 145, W, H - 145);
+        ctx.strokeStyle = "rgba(105,57,23,.22)";
+        ctx.lineWidth = 1;
+        for (let y = 145; y < H; y += 25) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+          const offset = ((y / 25) % 2) * 15;
+          for (let x = offset; x < W; x += 30) {
             ctx.beginPath();
-            ctx.moveTo(x, w.y);
-            ctx.lineTo(x - 4, w.y + w.h);
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - 2, y + 25);
             ctx.stroke();
           }
-        });
-        // decorative pyramids
-        [
-          [55, 315],
-          [310, 245],
-          [205, 465],
-        ].forEach(([x, y]) => {
-          ctx.fillStyle = "#c47a31";
-          ctx.beginPath();
-          ctx.moveTo(x, y - 28);
-          ctx.lineTo(x - 28, y + 20);
-          ctx.lineTo(x + 28, y + 20);
-          ctx.closePath();
-          ctx.fill();
-          ctx.fillStyle = "#e4a64f";
-          ctx.beginPath();
-          ctx.moveTo(x, y - 28);
-          ctx.lineTo(x, y + 20);
-          ctx.lineTo(x - 28, y + 20);
-          ctx.fill();
-        });
+        }
+        ctx.fillStyle = "rgba(255,226,148,.2)";
+        for (let i = 0; i < 42; i++) {
+          const x = (i * 83) % W;
+          const y = 160 + ((i * 137) % 675);
+          ctx.fillRect(x, y, 3 + (i % 4), 2);
+        }
+
+        drawTempleGate(136, 166, 118);
+        drawPalm(22, 238, 0.7);
+        drawPalm(368, 300, 0.72);
+        drawPalm(21, 790, 0.9);
+        drawPalm(369, 755, 0.82);
+        drawPyramid(338, 450, 19);
+        drawPyramid(58, 510, 16);
+        walls.forEach((w, index) => index === 2 ? drawObelisk(w) : drawSandstoneWall(w));
       }
       function drawTraps() {
         traps.forEach((t) => {
           if (t.type === "spikes") {
             const active = Math.sin(t.t * 2.3) > 0.45;
-            ctx.fillStyle = "#7d4a27";
+            ctx.fillStyle = "rgba(63,35,16,.3)";
+            ctx.fillRect(t.x + 4, t.y + 5, t.w, t.h);
+            ctx.fillStyle = active ? "#6d3b21" : "#9b642f";
             ctx.fillRect(t.x, t.y, t.w, t.h);
-            ctx.fillStyle = active ? "#ded7c2" : "#77634e";
+            ctx.strokeStyle = active ? "#ffbb39" : "#6f3c1d";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(t.x + 1.5, t.y + 1.5, t.w - 3, t.h - 3);
             for (let i = 0; i < 4; i++)
               for (let j = 0; j < 4; j++) {
-                ctx.beginPath();
-                ctx.moveTo(t.x + 6 + i * 11, t.y + 10 + j * 11);
-                ctx.lineTo(t.x + 11 + i * 11, t.y + 2 + j * 11);
-                ctx.lineTo(t.x + 16 + i * 11, t.y + 10 + j * 11);
-                ctx.fill();
+                const px = t.x + 7 + i * 11;
+                const py = t.y + 8 + j * 11;
+                polygon(
+                  [[px, py + 5], [px + 5, active ? py - 5 : py + 1], [px + 10, py + 5]],
+                  active ? "#f5e3ba" : "#72533b",
+                  active ? "#5e4432" : null,
+                );
               }
           }
           if (t.type === "fire") {
-            ctx.fillStyle = "#6e4528";
+            ctx.fillStyle = "rgba(62,34,16,.3)";
+            ctx.fillRect(t.x + 4, t.y + 5, t.w, t.h);
+            ctx.fillStyle = "#80502c";
             ctx.fillRect(t.x, t.y, t.w, t.h);
+            ctx.strokeStyle = "#0b819b";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(t.x + 2, t.y + 2, t.w - 4, t.h - 4);
             if (Math.sin(t.t * 2) > 0.35) {
-              ctx.fillStyle = "#ff7b1b";
               for (let y = t.y + 10; y < t.y + t.h; y += 18) {
+                const flicker = Math.sin(t.t * 13 + y) * 3;
+                ctx.fillStyle = "rgba(255,105,15,.2)";
                 ctx.beginPath();
-                ctx.arc(t.x + 15, y, 13, 0, Math.PI * 2);
+                ctx.arc(t.x + 15, y, 13 + flicker, 0, Math.PI * 2);
                 ctx.fill();
+                polygon(
+                  [[t.x + 7, y + 8], [t.x + 15, y - 13 - flicker], [t.x + 23, y + 8]],
+                  "#ff6b16",
+                );
+                polygon(
+                  [[t.x + 12, y + 7], [t.x + 16, y - 5 - flicker], [t.x + 20, y + 7]],
+                  "#ffd047",
+                );
               }
             }
           }
           if (t.type === "boulder") {
-            ctx.fillStyle = "#76543d";
+            ctx.fillStyle = "rgba(59,35,18,.35)";
+            ctx.beginPath();
+            ctx.ellipse(t.x + 7, t.y + 8, t.r * 1.05, t.r * 0.55, 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            const rock = ctx.createRadialGradient(t.x - 7, t.y - 9, 2, t.x, t.y, t.r);
+            rock.addColorStop(0, "#d0a064");
+            rock.addColorStop(0.55, "#8b623b");
+            rock.addColorStop(1, "#513722");
+            ctx.fillStyle = rock;
             ctx.beginPath();
             ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = "#4a3426";
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(t.x - 8, t.y - 12);
+            ctx.lineTo(t.x - 2, t.y - 3);
+            ctx.lineTo(t.x - 7, t.y + 5);
+            ctx.moveTo(t.x + 9, t.y - 5);
+            ctx.lineTo(t.x + 3, t.y + 4);
+            ctx.lineTo(t.x + 10, t.y + 10);
             ctx.stroke();
           }
         });
@@ -1499,6 +1680,11 @@
       });
       addEventListener("keyup", (e) => (keys[e.key] = false));
       buildSelectors();
+      if (
+        typeof location !== "undefined" &&
+        new URLSearchParams(location.search).has("play")
+      )
+        startGame();
       requestAnimationFrame(loop);
     </script>
   </body>
