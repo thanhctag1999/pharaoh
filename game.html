@@ -1,0 +1,1505 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Ai Cập Chibi Adventure</title>
+    <style>
+      :root {
+        --gold: #f7c84b;
+        --cyan: #35d9ff;
+        --brown: #3d2414;
+        --panel: rgba(25, 18, 13, 0.88);
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #17100c;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #fff;
+      }
+      #app {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at 50% 20%, #63401b, #17100c 70%);
+      }
+      #gameWrap {
+        position: relative;
+        height: 100%;
+        max-height: 932px;
+        aspect-ratio: 390/844;
+        width: min(100vw, 430px);
+        overflow: hidden;
+        background: #d9963c;
+        box-shadow: 0 0 35px #000;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+      }
+      .hud {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        padding: 10px;
+        display: flex;
+        gap: 7px;
+        align-items: center;
+        pointer-events: none;
+      }
+      .pill {
+        background: rgba(25, 24, 23, 0.9);
+        border: 2px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        padding: 7px 11px;
+        font-weight: 900;
+        text-shadow: 0 2px 2px #000;
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      #roundPill {
+        position: absolute;
+        top: 55px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 7px 18px;
+        border-color: #d9a62e;
+      }
+      #pauseBtn {
+        margin-left: auto;
+        width: 48px;
+        height: 48px;
+        pointer-events: auto;
+        border: 3px solid #e6b95f;
+        border-radius: 14px;
+        background: #252525;
+        padding: 10px;
+      }
+      #objective {
+        position: absolute;
+        top: 96px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(24, 16, 10, 0.68);
+        padding: 6px 12px;
+        border-radius: 14px;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .controls {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      #joy {
+        position: absolute;
+        left: 18px;
+        bottom: 25px;
+        width: 132px;
+        height: 132px;
+        border-radius: 50%;
+        background: rgba(20, 20, 20, 0.32);
+        border: 2px solid rgba(255, 255, 255, 0.18);
+        pointer-events: auto;
+        touch-action: none;
+      }
+      #knob {
+        position: absolute;
+        width: 66px;
+        height: 66px;
+        border-radius: 50%;
+        left: 33px;
+        top: 33px;
+        background: radial-gradient(circle at 35% 30%, #fff, #bbb 70%);
+        border: 4px solid #fff;
+        box-shadow: 0 4px 8px #0008;
+      }
+      .action {
+        position: absolute;
+        border-radius: 50%;
+        border: 3px solid #f6d178;
+        background: rgba(25, 20, 16, 0.9);
+        box-shadow: 0 5px 12px #0008;
+        pointer-events: auto;
+        display: grid;
+        place-items: center;
+      }
+      .action img {
+        width: 62%;
+        height: 62%;
+        object-fit: contain;
+      }
+      #throwBtn {
+        right: 18px;
+        bottom: 142px;
+        width: 82px;
+        height: 82px;
+      }
+      #meleeBtn {
+        right: 88px;
+        bottom: 60px;
+        width: 74px;
+        height: 74px;
+      }
+      #dashBtn {
+        right: 18px;
+        bottom: 18px;
+        width: 68px;
+        height: 68px;
+      }
+      #itemBtn {
+        right: 7px;
+        bottom: 238px;
+        width: 56px;
+        height: 56px;
+      }
+      #itemCount {
+        position: absolute;
+        right: -3px;
+        bottom: -3px;
+        background: #111;
+        border-radius: 50%;
+        padding: 2px 7px;
+        font-weight: bold;
+      }
+      .screen {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(#1e130aaa, #0e0907f2),
+          url("assets/gameplay_reference.png") center/cover;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        z-index: 20;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .logo {
+        font-size: 31px;
+        line-height: 1;
+        text-align: center;
+        color: #ffd86a;
+        text-shadow:
+          0 4px 0 #6d3300,
+          0 7px 16px #000;
+        font-weight: 1000;
+        margin-bottom: 10px;
+      }
+      .subtitle {
+        text-align: center;
+        color: #ffecc2;
+        margin-bottom: 14px;
+      }
+      .card {
+        width: 100%;
+        background: rgba(23, 16, 12, 0.91);
+        border: 2px solid #a77a33;
+        border-radius: 20px;
+        padding: 13px;
+        margin: 6px 0;
+      }
+      .charGrid,
+      .weaponGrid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+      }
+      .pick {
+        border: 2px solid #5e4b32;
+        background: #241b15;
+        border-radius: 12px;
+        padding: 4px;
+        color: white;
+        min-width: 0;
+      }
+      .pick.active {
+        border-color: #40dfff;
+        box-shadow: 0 0 0 2px #40dfff44;
+      }
+      .pick img {
+        width: 100%;
+        height: 60px;
+        object-fit: contain;
+      }
+      .pick span {
+        display: block;
+        font-size: 9px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .weaponGrid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .weaponPick {
+        height: 56px;
+        font-size: 11px;
+      }
+      .modeRow {
+        display: flex;
+        gap: 8px;
+      }
+      .modeRow select,
+      .modeRow input {
+        min-width: 0;
+        flex: 1;
+        border: 2px solid #735b38;
+        border-radius: 10px;
+        padding: 9px;
+        background: #241b15;
+        color: #fff;
+        font-weight: 700;
+      }
+      .mainBtn {
+        width: 100%;
+        border: 0;
+        border-radius: 17px;
+        padding: 14px;
+        background: linear-gradient(#ffd95e, #e99d1e);
+        color: #3a2105;
+        font-size: 20px;
+        font-weight: 1000;
+        box-shadow: 0 5px 0 #8e4b0f;
+        margin-top: 10px;
+      }
+      .resultBox {
+        text-align: center;
+      }
+      .resultBox h2 {
+        font-size: 38px;
+        margin: 0 0 8px;
+        color: #ffdc67;
+        text-shadow: 0 4px #6b3300;
+      }
+      .small {
+        font-size: 12px;
+        color: #dbc79e;
+      }
+      #toast {
+        position: absolute;
+        left: 50%;
+        top: 132px;
+        transform: translateX(-50%);
+        background: #17120ee8;
+        border: 2px solid #e3bb57;
+        border-radius: 14px;
+        padding: 8px 14px;
+        opacity: 0;
+        transition: 0.25s;
+        z-index: 12;
+        white-space: nowrap;
+      }
+      #toast.show {
+        opacity: 1;
+      }
+      @media (max-height: 700px) {
+        #joy {
+          transform: scale(0.85);
+          transform-origin: left bottom;
+        }
+        .action {
+          transform: scale(0.85);
+          transform-origin: right bottom;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="gameWrap">
+        <canvas id="game" width="390" height="844"></canvas>
+
+        <div class="hud">
+          <div class="pill">❤️ <span id="lives">1</span></div>
+          <div class="pill">🪙 <span id="coins">0</span></div>
+          <div class="pill">🏆 <span id="score">0</span></div>
+          <button id="pauseBtn">
+            <img src="assets/pause.svg" alt="Pause" />
+          </button>
+        </div>
+        <div class="pill" id="roundPill">
+          Vòng <span id="round">1</span> • Đích <span id="scoreTarget">3</span>
+        </div>
+        <div id="objective">💎 Trở thành người sống sót cuối cùng</div>
+        <div id="toast"></div>
+
+        <div class="controls">
+          <div id="joy"><div id="knob"></div></div>
+          <button class="action" id="throwBtn">
+            <img src="assets/boomerang.svg" alt="Ném" />
+          </button>
+          <button class="action" id="meleeBtn">
+            <span style="font-size: 35px">⚔️</span>
+          </button>
+          <button class="action" id="dashBtn">
+            <img src="assets/dash.svg" alt="Lướt" />
+          </button>
+          <button class="action" id="itemBtn">
+            <img id="itemIcon" src="assets/shield.svg" alt="Item" /><span
+              id="itemCount"
+              >0</span
+            >
+          </button>
+        </div>
+
+        <section id="menu" class="screen">
+          <div class="logo">AI CẬP<br />CHIBI ADVENTURE</div>
+          <div class="subtitle">
+            Đấu trường boomerang ma thuật – mobile demo
+          </div>
+          <div class="card">
+            <div style="font-weight: bold; margin-bottom: 8px">
+              Chọn nhân vật
+            </div>
+            <div class="charGrid" id="charGrid"></div>
+          </div>
+          <div class="card">
+            <div style="font-weight: bold; margin-bottom: 8px">Chọn vũ khí</div>
+            <div class="weaponGrid" id="weaponGrid"></div>
+          </div>
+          <div class="card">
+            <div style="font-weight: bold; margin-bottom: 8px">Độ dài trận</div>
+            <div class="modeRow">
+              <select id="matchType" aria-label="Chế độ trận">
+                <option value="ffa">Đấu tự do</option>
+                <option value="team">Đấu đội 2v2</option>
+              </select>
+              <select id="matchLength" aria-label="Độ dài trận">
+                <option value="3">Đấu nhanh — 3 điểm</option>
+                <option value="5">Tiêu chuẩn — 5 điểm</option>
+                <option value="10">Đấu dài — 10 điểm</option>
+                <option value="custom">Tùy chỉnh</option>
+              </select>
+              <input id="customTarget" class="hidden" type="number" min="1" max="20" value="3" aria-label="Điểm mục tiêu" />
+            </div>
+          </div>
+          <button class="mainBtn" id="startBtn">BẮT ĐẦU CHIẾN ĐẤU</button>
+          <div class="small" style="margin-top: 10px">
+            Điều khiển: joystick • ném • cận chiến • lướt
+          </div>
+        </section>
+
+        <section id="pauseScreen" class="screen hidden">
+          <div class="resultBox">
+            <h2>TẠM DỪNG</h2>
+            <p>Cuộc chiến đang chờ Pharaoh trở lại.</p>
+          </div>
+          <button class="mainBtn" id="resumeBtn">TIẾP TỤC</button>
+          <button class="mainBtn" id="restartBtn">CHƠI LẠI</button>
+        </section>
+
+        <section id="resultScreen" class="screen hidden">
+          <div class="resultBox">
+            <h2 id="resultTitle">VICTORY</h2>
+            <p id="resultText"></p>
+          </div>
+          <button class="mainBtn" id="nextBtn">VÒNG TIẾP THEO</button>
+          <button class="mainBtn" id="menuBtn">VỀ MENU</button>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("game"),
+        ctx = canvas.getContext("2d");
+      const W = 390,
+        H = 844;
+      const $ = (id) => document.getElementById(id);
+      const chars = [
+        { id: "pharaoh", name: "Pharaoh", img: "assets/pharaoh.png" },
+        { id: "bastet", name: "Bastet", img: "assets/bastet.png" },
+        { id: "anubis", name: "Anubis", img: "assets/anubis.png" },
+        { id: "scarab", name: "Scarab", img: "assets/scarab.png" },
+        { id: "mummy", name: "Mummy", img: "assets/mummy.png" },
+      ];
+      const weapons = [
+        {
+          id: "crescent",
+          name: "Lưỡi liềm",
+          speed: 5.2,
+          range: 285,
+          color: "#39ddff",
+        },
+        {
+          id: "khopesh",
+          name: "Khopesh",
+          speed: 4.7,
+          range: 250,
+          color: "#ff9d22",
+        },
+        { id: "sun", name: "Đĩa Ra", speed: 5.7, range: 220, color: "#ffd93b" },
+        {
+          id: "anubis",
+          name: "Song nguyệt",
+          speed: 5.0,
+          range: 270,
+          color: "#9f68ff",
+        },
+      ];
+      const images = {};
+      chars.forEach((c) => {
+        images[c.id] = new Image();
+        images[c.id].src = c.img;
+      });
+      let selectedChar = 0,
+        selectedWeapon = 0,
+        state = "menu",
+        paused = false,
+        round = 1,
+        playerScore = 0,
+        scoreTarget = 3,
+        matchType = "ffa",
+        scores = [0, 0, 0, 0, 0],
+        coins = 0,
+        last = 0,
+        time = 0,
+        stormRadius = 360,
+        roundEndTimer = 0,
+        roundToken = 0;
+      let player,
+        enemies = [],
+        projectiles = [],
+        items = [],
+        traps = [],
+        particles = [],
+        decoys = [],
+        walls = [];
+      const keys = {},
+        joy = { x: 0, y: 0, active: false };
+      const rand = (a, b) => a + Math.random() * (b - a),
+        clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+      function buildSelectors() {
+        $("charGrid").innerHTML = chars
+          .map(
+            (c, i) =>
+              `<button class="pick ${i === 0 ? "active" : ""}" data-i="${i}"><img src="${c.img}"><span>${c.name}</span></button>`,
+          )
+          .join("");
+        $("weaponGrid").innerHTML = weapons
+          .map(
+            (w, i) =>
+              `<button class="pick weaponPick ${i === 0 ? "active" : ""}" data-i="${i}">${w.name}</button>`,
+          )
+          .join("");
+        [...document.querySelectorAll("#charGrid .pick")].forEach(
+          (b) =>
+            (b.onclick = () => {
+              selectedChar = +b.dataset.i;
+              document
+                .querySelectorAll("#charGrid .pick")
+                .forEach((x) => x.classList.remove("active"));
+              b.classList.add("active");
+            }),
+        );
+        [...document.querySelectorAll("#weaponGrid .pick")].forEach(
+          (b) =>
+            (b.onclick = () => {
+              selectedWeapon = +b.dataset.i;
+              document
+                .querySelectorAll("#weaponGrid .pick")
+                .forEach((x) => x.classList.remove("active"));
+              b.classList.add("active");
+            }),
+        );
+      }
+      function makeUnit(x, y, charIndex, isPlayer = false, slot = charIndex, team = slot) {
+        return {
+          slot: isPlayer ? 0 : slot,
+          team: isPlayer ? 0 : team,
+          x,
+          y,
+          r: 17,
+          charIndex,
+          isPlayer,
+          alive: true,
+          angle: -Math.PI / 2,
+          speed: isPlayer ? 2.65 : 1.7,
+          cd: 0,
+          dashCd: 0,
+          meleeCd: 0,
+          shield: 0,
+          slow: 0,
+          invisible: 0,
+          boomerangs: [],
+          aiTimer: 0,
+          score: 0,
+          anim: 0,
+          outsideStorm: 0,
+          invulnerable: 0,
+          double: 0,
+          pierce: 0,
+          steer: 0,
+          fire: 0,
+          ice: 0,
+          speedBoost: 0,
+          revive: 0,
+        };
+      }
+      function resetRound() {
+        roundToken++;
+        clearTimeout(roundEndTimer);
+        roundEndTimer = 0;
+        projectiles = [];
+        items = [];
+        particles = [];
+        decoys = [];
+        time = 0;
+        stormRadius = 360;
+        player = makeUnit(195, 650, selectedChar, true, 0, 0);
+        enemies = matchType === "team"
+          ? [
+              makeUnit(125, 620, 1, false, 1, 0),
+              makeUnit(85, 260, 2, false, 2, 1),
+              makeUnit(305, 280, 3, false, 3, 1),
+            ]
+          : [
+              makeUnit(85, 260, 1, false, 1, 1),
+              makeUnit(305, 280, 2, false, 2, 2),
+              makeUnit(95, 470, 3, false, 3, 3),
+              makeUnit(300, 500, 4, false, 4, 4),
+            ];
+        traps = [
+          { type: "spikes", x: 185, y: 360, w: 48, h: 48, t: 0 },
+          { type: "spikes", x: 275, y: 600, w: 48, h: 48, t: 1.7 },
+          { type: "fire", x: 65, y: 560, w: 30, h: 80, t: 0 },
+          { type: "boulder", x: 40, y: 420, r: 20, vx: 1.45 },
+        ];
+        walls = [
+          { x: 35, y: 175, w: 105, h: 25 },
+          { x: 250, y: 180, w: 105, h: 25 },
+          { x: 130, y: 290, w: 55, h: 95 },
+          { x: 240, y: 340, w: 75, h: 28 },
+          { x: 45, y: 690, w: 110, h: 25 },
+          { x: 225, y: 700, w: 115, h: 25 },
+          { x: 155, y: 525, w: 80, h: 24 },
+        ];
+        for (let i = 0; i < 3; i++) spawnItem();
+        updateHUD();
+        state = "playing";
+        paused = false;
+        $("resultScreen").classList.add("hidden");
+        $("pauseScreen").classList.add("hidden");
+      }
+      function startGame() {
+        round = 1;
+        playerScore = 0;
+        matchType = $("matchType").value;
+        scoreTarget = $("matchLength").value === "custom"
+          ? clamp(parseInt($("customTarget").value, 10) || 3, 1, 20)
+          : parseInt($("matchLength").value, 10);
+        $("objective").textContent =
+          matchType === "team"
+            ? "💎 Giúp đội bạn trở thành đội cuối cùng còn sống"
+            : "💎 Trở thành người sống sót cuối cùng";
+        scores = [0, 0, 0, 0, 0];
+        coins = 0;
+        $("menu").classList.add("hidden");
+        resetRound();
+      }
+      function updateHUD() {
+        $("round").textContent = round;
+        $("score").textContent = playerScore;
+        $("scoreTarget").textContent = scoreTarget;
+        $("coins").textContent = coins;
+        $("lives").textContent = player && player.alive ? 1 : 0;
+        $("itemCount").textContent = player ? activeItemCount(player) : 0;
+      }
+      function activeItemCount(u) {
+        if (!u) return 0;
+        return [u.shield, u.reveal, u.fire, u.ice, u.speedBoost, u.double,
+          u.pierce, u.steer, u.invisible, u.revive, u.teleport].filter((v) => v > 0).length;
+      }
+      function showToast(t) {
+        const e = $("toast");
+        e.textContent = t;
+        e.classList.add("show");
+        clearTimeout(e._t);
+        e._t = setTimeout(() => e.classList.remove("show"), 1300);
+      }
+      function collideWall(u, nx, ny) {
+        for (const w of walls) {
+          if (
+            nx + u.r > w.x &&
+            nx - u.r < w.x + w.w &&
+            ny + u.r > w.y &&
+            ny - u.r < w.y + w.h
+          )
+            return true;
+        }
+        return (
+          nx - u.r < 12 ||
+          nx + u.r > W - 12 ||
+          ny - u.r < 145 ||
+          ny + u.r > H - 18
+        );
+      }
+      function moveUnit(u, dx, dy, dt) {
+        if (!u.alive) return;
+        let s =
+          u.speed *
+          (u.slow > 0 ? 0.55 : 1) *
+          (u.speedBoost > 0 ? 1.35 : 1) *
+          (u.outsideStorm > 0 ? 0.78 : 1) *
+          dt *
+          60;
+        let nx = u.x + dx * s,
+          ny = u.y + dy * s;
+        if (!collideWall(u, nx, u.y)) u.x = nx;
+        if (!collideWall(u, u.x, ny)) u.y = ny;
+        if (Math.hypot(dx, dy) > 0.1) {
+          u.angle = Math.atan2(dy, dx);
+          u.anim += dt * 10;
+        }
+      }
+      function throwBoomerang(u) {
+        const allowed = u.double > 0 ? 2 : 1;
+        if (!u.alive || u.cd > 0 || u.boomerangs.length >= allowed) return;
+        const weaponIndex = u.isPlayer ? selectedWeapon : u.charIndex % weapons.length;
+        const wp = weapons[weaponIndex];
+        const p = {
+          x: u.x,
+          y: u.y,
+          vx: Math.cos(u.angle) * wp.speed,
+          vy: Math.sin(u.angle) * wp.speed,
+          owner: u,
+          weaponIndex,
+          life: 0,
+          returning: false,
+          r: 9,
+          color: wp.color,
+          grounded: false,
+          explosive: u.fire > 0,
+          ice: u.ice > 0,
+          pierce: u.pierce > 0,
+          steer: u.steer > 0,
+          hitUnits: new Set(),
+        };
+        projectiles.push(p);
+        u.boomerangs.push(p);
+        u.invisible = 0;
+        u.cd = 0.25;
+      }
+      function recall(u) {
+        u.boomerangs.forEach(startReturning);
+      }
+      function startReturning(p) {
+        if (!p.returning) p.hitUnits.clear();
+        p.returning = true;
+        p.grounded = false;
+      }
+      function melee(u) {
+        if (!u.alive || u.meleeCd > 0) return;
+        u.meleeCd = 0.7;
+        u.invisible = 0;
+        particles.push({ type: "slash", x: u.x, y: u.y, a: u.angle, t: 0 });
+        [...enemies, player].forEach((v) => {
+          if (v !== u && v.team !== u.team && v.alive && dist(u, v) < 52) {
+            let da = Math.abs(
+              Math.atan2(
+                Math.sin(Math.atan2(v.y - u.y, v.x - u.x) - u.angle),
+                Math.cos(Math.atan2(v.y - u.y, v.x - u.x) - u.angle),
+              ),
+            );
+            if (da < 1.2) hit(v, u);
+          }
+        });
+        for (const p of projectiles)
+          if (p.owner.team !== u.team && Math.hypot(p.x - u.x, p.y - u.y) < 48) {
+            const oldOwner = p.owner;
+            oldOwner.boomerangs = oldOwner.boomerangs.filter((x) => x !== p);
+            p.vx *= -1;
+            p.vy *= -1;
+            p.owner = u;
+            p.returning = false;
+            p.grounded = false;
+            p.hitUnits.clear();
+            u.boomerangs.push(p);
+          }
+      }
+      function dash(u, dx = Math.cos(u.angle), dy = Math.sin(u.angle)) {
+        if (!u.alive || u.dashCd > 0) return;
+        u.dashCd = u.speedBoost > 0 ? 1.1 : 2.2;
+        for (let i = 0; i < 7; i++) moveUnit(u, dx * 2.2, dy * 2.2, 1 / 60);
+        particles.push({ type: "dust", x: u.x, y: u.y, t: 0 });
+      }
+      function hit(v, attacker) {
+        if (!v.alive || v.invulnerable > 0) return false;
+        if (v.shield > 0) {
+          v.shield = 0;
+          if (v.isPlayer) showToast("Khiên Scarab đã vỡ!");
+          return false;
+        }
+        if (v.revive > 0) {
+          v.revive = 0;
+          v.invulnerable = 1.5;
+          v.slow = 0;
+          v.outsideStorm = 0;
+          particles.push({ type: "revive", x: v.x, y: v.y, t: 0 });
+          if (v.isPlayer) showToast("Osiris đã hồi sinh bạn!");
+          return false;
+        }
+        v.alive = false;
+        v.boomerangs.forEach((p) => (p.dead = true));
+        v.boomerangs = [];
+        particles.push({ type: "boom", x: v.x, y: v.y, t: 0 });
+        if (attacker && attacker.isPlayer) {
+          coins += 10;
+          showToast("+10 vàng");
+        }
+        checkRoundEnd();
+        return true;
+      }
+      function checkRoundEnd() {
+        const aliveUnits = [player, ...enemies].filter((u) => u.alive);
+        const aliveSides = new Set(
+          aliveUnits.map((u) => (matchType === "team" ? u.team : u.slot)),
+        );
+        if (aliveSides.size > 1 || roundEndTimer) return;
+        const token = roundToken;
+        roundEndTimer = setTimeout(() => {
+          if (token !== roundToken || state !== "playing") return;
+          roundEndTimer = 0;
+          const survivors = [player, ...enemies].filter((u) => u.alive);
+          const winner = survivors[0] || null;
+          const winnerIndex = winner
+            ? matchType === "team" ? winner.team : winner.slot
+            : -1;
+          if (winnerIndex >= 0) scores[winnerIndex]++;
+          playerScore = scores[0];
+          const win = winnerIndex === 0;
+          const matchWinner = scores.findIndex((value) => value >= scoreTarget);
+          state = "result";
+          $("resultTitle").textContent = winner ? (win ? "VICTORY" : "DEFEAT") : "HÒA";
+          $("resultText").textContent = winner
+            ? win
+              ? matchType === "team"
+                ? `Đội bạn thắng vòng và nhận 1 Scarab (${playerScore}/${scoreTarget}).`
+                : `Bạn thắng vòng và nhận 1 Scarab (${playerScore}/${scoreTarget}).`
+              : matchType === "team"
+                ? "Đội đối thủ thắng vòng này."
+                : `${chars[winner.charIndex].name} thắng vòng này.`
+            : "Tất cả bị loại cùng lúc, không ai nhận điểm.";
+          $("nextBtn").textContent = matchWinner >= 0 ? "KẾT THÚC TRẬN" : "VÒNG TIẾP THEO";
+          $("nextBtn").dataset.matchOver = matchWinner >= 0 ? "1" : "0";
+          if (matchWinner >= 0) {
+            $("resultTitle").textContent = matchWinner === 0 ? "THẮNG TRẬN" : "THUA TRẬN";
+            $("resultText").textContent =
+              matchWinner === 0
+                ? matchType === "team"
+                  ? `Đội của bạn là đội đầu tiên đạt ${scoreTarget} Scarab vàng!`
+                  : `Bạn là người đầu tiên đạt ${scoreTarget} Scarab vàng!`
+                : matchType === "team"
+                  ? `Đội đối thủ là đội đầu tiên đạt ${scoreTarget} Scarab vàng.`
+                  : `${chars[matchWinner].name} là người đầu tiên đạt ${scoreTarget} Scarab vàng.`;
+          }
+          $("resultScreen").classList.remove("hidden");
+          updateHUD();
+        }, 180);
+      }
+      function spawnItem() {
+        const types = [
+          "shield", "eye", "fire", "ice", "dash", "double",
+          "pierce", "steer", "invisible", "clone", "teleport", "revive",
+        ];
+        let x, y;
+        do {
+          x = rand(45, 345);
+          y = rand(220, 650);
+        } while (collideWall({ r: 12 }, x, y));
+        items.push({
+          x,
+          y,
+          type: types[Math.floor(Math.random() * types.length)],
+          r: 13,
+          t: 0,
+        });
+      }
+      function collectItem(u, it) {
+        const notify = (message) => {
+          if (u.isPlayer) showToast(message);
+        };
+        if (it.type === "shield") {
+          u.shield = 1;
+          notify("Khiên Scarab");
+        }
+        if (it.type === "eye") {
+          u.reveal = 8;
+          notify("Mắt thần Horus");
+        }
+        if (it.type === "fire") {
+          u.fire = 8;
+          notify("Lửa thần Ra");
+        }
+        if (it.type === "ice") {
+          u.ice = 8;
+          notify("Băng nguyền Anubis");
+        }
+        if (it.type === "dash") {
+          u.dashCd = 0;
+          u.speedBoost = 8;
+          notify("Sand Dash");
+        }
+        if (it.type === "double") {
+          u.double = 10;
+          notify("Vòng mặt trời kép");
+        }
+        if (it.type === "pierce") {
+          u.pierce = 10;
+          notify("Vũ khí xuyên tường");
+        }
+        if (it.type === "steer") {
+          u.steer = 10;
+          notify("Quyền trượng điều khiển");
+        }
+        if (it.type === "invisible") {
+          u.invisible = 8;
+          notify("Tàng hình sa mạc");
+        }
+        if (it.type === "clone") {
+          decoys.push({
+            x: u.x + rand(-24, 24), y: u.y + rand(-24, 24), owner: u,
+            charIndex: u.charIndex, alive: true, invisible: 0, t: 6,
+            angle: rand(-Math.PI, Math.PI), turn: 0,
+          });
+          notify("Phân thân Pharaoh");
+        }
+        if (it.type === "teleport") {
+          u.teleport = (u.teleport || 0) + 1;
+          notify("Teleport Scarab — chạm nút item");
+        }
+        if (it.type === "revive") {
+          u.revive = 1;
+          notify("Hồi sinh Osiris");
+        }
+      }
+      function explode(p) {
+        particles.push({ type: "boom", x: p.x, y: p.y, t: 0 });
+        for (const u of [player, ...enemies]) {
+          if (u.team !== p.owner.team && u.alive && dist(p, u) < 62) hit(u, p.owner);
+        }
+      }
+      function useActiveItem(u) {
+        if (!u || !u.alive) return;
+        if (u.teleport > 0 && u.boomerangs.length) {
+          const p = u.boomerangs[0];
+          const nx = clamp(p.x, 30, W - 30);
+          const ny = clamp(p.y, 170, H - 35);
+          if (!collideWall(u, nx, ny)) {
+            u.x = nx;
+            u.y = ny;
+            u.teleport--;
+            showToast("Đã dịch chuyển tới vũ khí");
+            recall(u);
+            return;
+          }
+        }
+        showToast(u.teleport > 0 ? "Hãy ném vũ khí trước" : "Các cổ vật đang tự kích hoạt");
+      }
+      function update(dt) {
+        if (state !== "playing" || paused) return;
+        time += dt;
+        if (time > 35) stormRadius = Math.max(105, 360 - (time - 35) * 7);
+        [player, ...enemies].forEach((u) => {
+          u.cd = Math.max(0, u.cd - dt);
+          u.dashCd = Math.max(0, u.dashCd - dt);
+          u.meleeCd = Math.max(0, u.meleeCd - dt);
+          u.invulnerable = Math.max(0, u.invulnerable - dt);
+          u.slow = Math.max(0, u.slow - dt);
+          u.invisible = Math.max(0, u.invisible - dt);
+          u.reveal = Math.max(0, (u.reveal || 0) - dt);
+          u.fire = Math.max(0, (u.fire || 0) - dt);
+          u.ice = Math.max(0, (u.ice || 0) - dt);
+          u.speedBoost = Math.max(0, (u.speedBoost || 0) - dt);
+          u.double = Math.max(0, (u.double || 0) - dt);
+          u.pierce = Math.max(0, (u.pierce || 0) - dt);
+          u.steer = Math.max(0, (u.steer || 0) - dt);
+        });
+        let dx =
+            joy.x +
+            (keys.ArrowRight || keys.d ? 1 : 0) -
+            (keys.ArrowLeft || keys.a ? 1 : 0),
+          dy =
+            joy.y +
+            (keys.ArrowDown || keys.s ? 1 : 0) -
+            (keys.ArrowUp || keys.w ? 1 : 0),
+          m = Math.hypot(dx, dy);
+        if (m > 1) {
+          dx /= m;
+          dy /= m;
+        }
+        moveUnit(player, dx, dy, dt);
+        // AI
+        for (const e of enemies) {
+          if (!e.alive) continue;
+          e.aiTimer -= dt;
+          const candidates = [player, ...enemies, ...decoys].filter(
+            (u) =>
+              u !== e &&
+              u.alive &&
+              u.owner !== e &&
+              (u.owner ? u.owner.team !== e.team : u.team !== e.team) &&
+              (u.invisible <= 0 || e.reveal > 0),
+          );
+          const target = candidates.sort((a, b) => dist(e, a) - dist(e, b))[0];
+          if (!target) continue;
+          const a = Math.atan2(target.y - e.y, target.x - e.x),
+            d = dist(e, target);
+          let mx = Math.cos(a),
+            my = Math.sin(a);
+          if (d < 90) {
+            mx = -mx * 0.5;
+            my = -my * 0.5;
+          }
+          if (e.aiTimer < 0) {
+            e.aiTimer = rand(0.5, 1.4);
+            if (e.boomerangs.length && Math.random() < 0.35) recall(e);
+            else if (d < 260 && Math.random() < 0.75) throwBoomerang(e);
+            if (d < 55 && Math.random() < 0.5) melee(e);
+            if (Math.random() < 0.16) dash(e, mx, my);
+          }
+          moveUnit(e, mx, my, dt);
+        }
+        for (const d of decoys) {
+          d.t -= dt;
+          d.turn -= dt;
+          if (d.turn <= 0) {
+            d.turn = rand(0.5, 1.2);
+            d.angle += rand(-1.4, 1.4);
+          }
+          const nx = d.x + Math.cos(d.angle) * dt * 65;
+          const ny = d.y + Math.sin(d.angle) * dt * 65;
+          if (!collideWall({ r: 17 }, nx, d.y)) d.x = nx;
+          else d.angle += Math.PI;
+          if (!collideWall({ r: 17 }, d.x, ny)) d.y = ny;
+          else d.angle += Math.PI;
+          if (d.t <= 0) d.alive = false;
+        }
+        decoys = decoys.filter((d) => d.alive);
+        // projectiles
+        for (const p of projectiles) {
+          if (!p.owner.alive) {
+            p.owner.boomerangs = p.owner.boomerangs.filter((x) => x !== p);
+            p.dead = true;
+            continue;
+          }
+          p.life += dt;
+          const wp = weapons[p.weaponIndex];
+          if (!p.returning && !p.grounded && p.life * wp.speed * 60 >= wp.range)
+            startReturning(p);
+          if (p.steer && !p.returning && !p.grounded && p.owner.isPlayer) {
+            p.vx = Math.cos(p.owner.angle) * wp.speed;
+            p.vy = Math.sin(p.owner.angle) * wp.speed;
+          }
+          if (p.returning) {
+            const a = Math.atan2(p.owner.y - p.y, p.owner.x - p.x);
+            p.vx = Math.cos(a) * wp.speed * 1.18;
+            p.vy = Math.sin(a) * wp.speed * 1.18;
+          }
+          if (!p.grounded) {
+            p.x += p.vx * dt * 60;
+            p.y += p.vy * dt * 60;
+          }
+          if (p.x < 10 || p.x > W - 10 || p.y < 145 || p.y > H - 10) {
+            p.x = clamp(p.x, 12, W - 12);
+            p.y = clamp(p.y, 147, H - 12);
+            p.grounded = true;
+            p.returning = false;
+            if (p.explosive) {
+              explode(p);
+              p.dead = true;
+            }
+          }
+          for (const w of walls)
+            if (!p.dead && !p.pierce && p.x > w.x && p.x < w.x + w.w && p.y > w.y && p.y < w.y + w.h) {
+              p.x -= p.vx * dt * 60;
+              p.y -= p.vy * dt * 60;
+              p.grounded = true;
+              p.returning = false;
+              if (p.explosive) {
+                explode(p);
+                p.dead = true;
+              }
+            }
+          if (p.dead) {
+            p.owner.boomerangs = p.owner.boomerangs.filter((x) => x !== p);
+            continue;
+          }
+          for (const u of [player, ...enemies])
+            if (
+              u !== p.owner &&
+              u.team !== p.owner.team &&
+              u.alive &&
+              !p.grounded &&
+              !p.hitUnits.has(u.slot) &&
+              Math.hypot(p.x - u.x, p.y - u.y) < u.r + p.r
+            ) {
+              p.hitUnits.add(u.slot);
+              hit(u, p.owner);
+              if (p.explosive) explode(p);
+              if (p.ice && u.alive) u.slow = 3;
+              startReturning(p);
+              p.hitUnits.add(u.slot);
+            }
+          if (p.grounded && dist(p, p.owner) < 25) p.dead = true;
+          if (
+            p.returning &&
+            Math.hypot(p.x - p.owner.x, p.y - p.owner.y) < 22
+          ) {
+            p.dead = true;
+          }
+          if (p.dead)
+            p.owner.boomerangs = p.owner.boomerangs.filter((x) => x !== p);
+        }
+        projectiles = projectiles.filter((p) => !p.dead);
+        // items
+        items.forEach((it) => {
+          it.t += dt;
+          for (const u of [player, ...enemies]) {
+            if (!it.dead && u.alive && dist(u, it) < 30) {
+              collectItem(u, it);
+              it.dead = true;
+              const token = roundToken;
+              setTimeout(() => {
+                if (token === roundToken && state === "playing") spawnItem();
+              }, 1500);
+            }
+          }
+        });
+        items = items.filter((i) => !i.dead);
+        // traps
+        traps.forEach((t) => {
+          t.t += dt;
+          if (t.type === "boulder") {
+            t.x += t.vx * dt * 60;
+            if (t.x < 30 || t.x > 360) t.vx *= -1;
+            for (const u of [player, ...enemies])
+              if (u.alive && Math.hypot(u.x - t.x, u.y - t.y) < u.r + t.r)
+                hit(u, null);
+          }
+          if (t.type === "spikes" && Math.sin(t.t * 2.3) > 0.45)
+            for (const u of [player, ...enemies])
+              if (
+                u.alive &&
+                u.x > t.x &&
+                u.x < t.x + t.w &&
+                u.y > t.y &&
+                u.y < t.y + t.h
+              )
+                hit(u, null);
+          if (t.type === "fire" && Math.sin(t.t * 2) > 0.35)
+            for (const u of [player, ...enemies])
+              if (
+                u.alive &&
+                u.x > t.x - 8 &&
+                u.x < t.x + t.w + 8 &&
+                u.y > t.y &&
+                u.y < t.y + t.h
+              )
+                hit(u, null);
+        });
+        // storm
+        const cx = W / 2,
+          cy = 430;
+        for (const u of [player, ...enemies]) {
+          if (!u.alive) continue;
+          if (time > 35 && Math.hypot(u.x - cx, u.y - cy) > stormRadius) {
+            u.outsideStorm += dt;
+            if (u.outsideStorm >= 2.5) hit(u, null);
+          } else {
+            u.outsideStorm = Math.max(0, u.outsideStorm - dt * 2);
+          }
+        }
+        particles.forEach((p) => (p.t += dt));
+        particles = particles.filter((p) => p.t < 0.7);
+        updateHUD();
+      }
+      function drawMap() {
+        const g = ctx.createLinearGradient(0, 140, 0, H);
+        g.addColorStop(0, "#e6ad55");
+        g.addColorStop(1, "#b76a28");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+        // tiles
+        ctx.strokeStyle = "rgba(107,61,25,.18)";
+        ctx.lineWidth = 1;
+        for (let y = 145; y < H; y += 28)
+          for (let x = ((y / 28) % 2) * 14 - 14; x < W; x += 28)
+            ctx.strokeRect(x, y, 28, 28);
+        // distant structures
+        ctx.fillStyle = "#e2a04a";
+        ctx.beginPath();
+        ctx.moveTo(45, 145);
+        ctx.lineTo(90, 70);
+        ctx.lineTo(135, 145);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(265, 145);
+        ctx.lineTo(315, 50);
+        ctx.lineTo(365, 145);
+        ctx.fill();
+        // walls
+        walls.forEach((w) => {
+          ctx.fillStyle = "#8c5427";
+          ctx.fillRect(w.x + 4, w.y + 6, w.w, w.h);
+          ctx.fillStyle = "#d89a49";
+          ctx.fillRect(w.x, w.y, w.w, w.h);
+          ctx.strokeStyle = "#6e3d1d";
+          ctx.strokeRect(w.x, w.y, w.w, w.h);
+          for (let x = w.x + 8; x < w.x + w.w; x += 18) {
+            ctx.beginPath();
+            ctx.moveTo(x, w.y);
+            ctx.lineTo(x - 4, w.y + w.h);
+            ctx.stroke();
+          }
+        });
+        // decorative pyramids
+        [
+          [55, 315],
+          [310, 245],
+          [205, 465],
+        ].forEach(([x, y]) => {
+          ctx.fillStyle = "#c47a31";
+          ctx.beginPath();
+          ctx.moveTo(x, y - 28);
+          ctx.lineTo(x - 28, y + 20);
+          ctx.lineTo(x + 28, y + 20);
+          ctx.closePath();
+          ctx.fill();
+          ctx.fillStyle = "#e4a64f";
+          ctx.beginPath();
+          ctx.moveTo(x, y - 28);
+          ctx.lineTo(x, y + 20);
+          ctx.lineTo(x - 28, y + 20);
+          ctx.fill();
+        });
+      }
+      function drawTraps() {
+        traps.forEach((t) => {
+          if (t.type === "spikes") {
+            const active = Math.sin(t.t * 2.3) > 0.45;
+            ctx.fillStyle = "#7d4a27";
+            ctx.fillRect(t.x, t.y, t.w, t.h);
+            ctx.fillStyle = active ? "#ded7c2" : "#77634e";
+            for (let i = 0; i < 4; i++)
+              for (let j = 0; j < 4; j++) {
+                ctx.beginPath();
+                ctx.moveTo(t.x + 6 + i * 11, t.y + 10 + j * 11);
+                ctx.lineTo(t.x + 11 + i * 11, t.y + 2 + j * 11);
+                ctx.lineTo(t.x + 16 + i * 11, t.y + 10 + j * 11);
+                ctx.fill();
+              }
+          }
+          if (t.type === "fire") {
+            ctx.fillStyle = "#6e4528";
+            ctx.fillRect(t.x, t.y, t.w, t.h);
+            if (Math.sin(t.t * 2) > 0.35) {
+              ctx.fillStyle = "#ff7b1b";
+              for (let y = t.y + 10; y < t.y + t.h; y += 18) {
+                ctx.beginPath();
+                ctx.arc(t.x + 15, y, 13, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+          }
+          if (t.type === "boulder") {
+            ctx.fillStyle = "#76543d";
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#4a3426";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+          }
+        });
+      }
+      function drawItems() {
+        const icon = {
+          shield: "🛡️",
+          eye: "👁️",
+          fire: "🔥",
+          ice: "❄️",
+          dash: "⚡",
+          double: "☀️",
+          pierce: "💫",
+          steer: "🪄",
+          invisible: "🌫️",
+          clone: "👥",
+          teleport: "🌀",
+          revive: "𓁿",
+        };
+        items.forEach((it) => {
+          ctx.save();
+          ctx.translate(it.x, it.y + Math.sin(it.t * 4) * 4);
+          ctx.fillStyle = "#fff4";
+          ctx.beginPath();
+          ctx.arc(0, 0, 20, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.font = "24px serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(icon[it.type], 0, 0);
+          ctx.restore();
+        });
+      }
+      function drawUnit(u) {
+        if (!u.alive) return;
+        ctx.save();
+        ctx.translate(u.x, u.y);
+        if (u.invisible > 0 && !(player && player.reveal > 0)) ctx.globalAlpha = 0.22;
+        ctx.fillStyle = "rgba(0,0,0,.25)";
+        ctx.beginPath();
+        ctx.ellipse(0, 14, 18, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        const im = images[chars[u.charIndex].id];
+        const bob = Math.sin(u.anim) * 2;
+        if (im.complete) {
+          ctx.drawImage(im, -28, -50 + bob, 56, 77);
+        } else {
+          ctx.fillStyle = "#ffd46b";
+          ctx.beginPath();
+          ctx.arc(0, -10, 18, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (u.shield > 0) {
+          ctx.strokeStyle = "#42ddff";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(0, -10, 28, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        if (u.invulnerable > 0) {
+          ctx.strokeStyle = "#fff4a3";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(0, -10, 32, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        if (!u.isPlayer) {
+          ctx.fillStyle = "#421b13";
+          ctx.fillRect(-18, -58, 36, 5);
+          ctx.fillStyle =
+            matchType === "team" && u.team === player.team ? "#35d9ff" : "#f04c3b";
+          ctx.fillRect(-18, -58, 36, 5);
+        }
+        if (u.isPlayer) {
+          ctx.strokeStyle = "#38e6ff";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(0, 18, 24, 9, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+      function drawDecoy(d) {
+        ctx.save();
+        ctx.globalAlpha = 0.48;
+        ctx.translate(d.x, d.y);
+        const im = images[chars[d.charIndex].id];
+        if (im.complete) ctx.drawImage(im, -28, -50, 56, 77);
+        ctx.strokeStyle = "#d7b4ff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(0, 18, 24, 9, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      function drawProjectiles() {
+        projectiles.forEach((p) => {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.life * 12);
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 6;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.arc(0, 0, 12, 0.3, 2.7);
+          ctx.stroke();
+          ctx.restore();
+        });
+      }
+      function drawParticles() {
+        particles.forEach((p) => {
+          ctx.save();
+          ctx.globalAlpha = 1 - p.t / 0.7;
+          if (p.type === "slash") {
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.a);
+            ctx.strokeStyle = "#fff5a5";
+            ctx.lineWidth = 7;
+            ctx.beginPath();
+            ctx.arc(0, 0, 38, -0.8, 0.8);
+            ctx.stroke();
+          } else {
+            ctx.fillStyle = p.type === "boom" ? "#ff7b24" : "#e5bd76";
+            for (let i = 0; i < 7; i++) {
+              ctx.beginPath();
+              ctx.arc(
+                p.x + Math.cos(i) * p.t * 50,
+                p.y + Math.sin(i) * p.t * 50,
+                5,
+                0,
+                Math.PI * 2,
+              );
+              ctx.fill();
+            }
+          }
+          ctx.restore();
+        });
+      }
+      function render() {
+        drawMap();
+        drawTraps();
+        drawItems();
+        [...enemies, player].filter(Boolean).sort((a, b) => a.y - b.y).forEach(drawUnit);
+        decoys.forEach(drawDecoy);
+        drawProjectiles();
+        drawParticles();
+        if (time > 35) {
+          ctx.save();
+          ctx.fillStyle = "rgba(154,91,36,.45)";
+          ctx.beginPath();
+          ctx.rect(0, 0, W, H);
+          ctx.arc(W / 2, 430, stormRadius, 0, Math.PI * 2, true);
+          ctx.fill("evenodd");
+          ctx.strokeStyle = "#ffd066";
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.arc(W / 2, 430, stormRadius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+      function loop(ts) {
+        const dt = Math.min(0.033, (ts - last) / 1000 || 0);
+        last = ts;
+        update(dt);
+        render();
+        requestAnimationFrame(loop);
+      }
+      function setJoy(clientX, clientY) {
+        const r = $("joy").getBoundingClientRect(),
+          cx = r.left + r.width / 2,
+          cy = r.top + r.height / 2;
+        let x = (clientX - cx) / (r.width / 2),
+          y = (clientY - cy) / (r.height / 2),
+          m = Math.hypot(x, y);
+        if (m > 1) {
+          x /= m;
+          y /= m;
+        }
+        joy.x = x;
+        joy.y = y;
+        $("knob").style.left = 33 + x * 30 + "px";
+        $("knob").style.top = 33 + y * 30 + "px";
+      }
+      $("joy").addEventListener("pointerdown", (e) => {
+        joy.active = true;
+        $("joy").setPointerCapture(e.pointerId);
+        setJoy(e.clientX, e.clientY);
+      });
+      $("joy").addEventListener("pointermove", (e) => {
+        if (joy.active) setJoy(e.clientX, e.clientY);
+      });
+      $("joy").addEventListener("pointerup", () => {
+        joy.active = false;
+        joy.x = joy.y = 0;
+        $("knob").style.left = "33px";
+        $("knob").style.top = "33px";
+      });
+      $("joy").addEventListener("pointercancel", () => {
+        joy.active = false;
+        joy.x = joy.y = 0;
+        $("knob").style.left = "33px";
+        $("knob").style.top = "33px";
+      });
+      $("throwBtn").onpointerdown = () => {
+        if (!player) return;
+        const allowed = player.double > 0 ? 2 : 1;
+        if (player.boomerangs.length >= allowed) recall(player);
+        else throwBoomerang(player);
+      };
+      $("meleeBtn").onpointerdown = () => {
+        if (player) melee(player);
+      };
+      $("dashBtn").onpointerdown = () => {
+        if (player)
+          dash(
+            player,
+            joy.x || Math.cos(player.angle),
+            joy.y || Math.sin(player.angle),
+          );
+      };
+      $("itemBtn").onpointerdown = () => useActiveItem(player);
+      $("pauseBtn").onclick = () => {
+        if (state === "playing") {
+          paused = true;
+          $("pauseScreen").classList.remove("hidden");
+        }
+      };
+      $("resumeBtn").onclick = () => {
+        paused = false;
+        $("pauseScreen").classList.add("hidden");
+      };
+      $("restartBtn").onclick = () => resetRound();
+      $("startBtn").onclick = startGame;
+      $("matchLength").onchange = () => {
+        $("customTarget").classList.toggle("hidden", $("matchLength").value !== "custom");
+      };
+      $("nextBtn").onclick = () => {
+        if ($("nextBtn").dataset.matchOver === "1") {
+          $("resultScreen").classList.add("hidden");
+          $("menu").classList.remove("hidden");
+          state = "menu";
+        } else {
+          round++;
+          resetRound();
+        }
+      };
+      $("menuBtn").onclick = () => {
+        $("resultScreen").classList.add("hidden");
+        $("menu").classList.remove("hidden");
+        state = "menu";
+      };
+      addEventListener("keydown", (e) => {
+        keys[e.key] = true;
+        if (!player || state !== "playing" || paused) return;
+        if ([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key))
+          e.preventDefault();
+        if (e.key === " ") {
+          const allowed = player.double > 0 ? 2 : 1;
+          if (player.boomerangs.length >= allowed) recall(player);
+          else throwBoomerang(player);
+        }
+        if (e.key === "Shift") dash(player);
+        if (e.key.toLowerCase() === "f") melee(player);
+        if (e.key.toLowerCase() === "e") useActiveItem(player);
+      });
+      addEventListener("keyup", (e) => (keys[e.key] = false));
+      buildSelectors();
+      requestAnimationFrame(loop);
+    </script>
+  </body>
+</html>
